@@ -82,12 +82,12 @@ class Example extends React.Component {
         progress={progress}
         curveColor="#0cc"
         gridColor="#dee"
-        color="#a3a"
-        handleColor="#a3a"
+        color="#33a"
+        handleColor="#33a"
         progressColor="#0cc"
         padding={[ 50, 50, 50, 50]}
       >
-      <text x={0} y={16} fill="#a3a">Uncontrolled Bezier Editor</text>
+      <text x={0} y={16} fill="#33a">Uncontrolled Bezier Editor</text>
     </BezierEditor>
 
       <p>
