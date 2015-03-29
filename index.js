@@ -16,10 +16,19 @@ const propTypes = {
   onChange: PropTypes.func,
   width: PropTypes.number,
   height: PropTypes.number,
-  handleRadius: PropTypes.number,
   padding: PropTypes.array,
+  handleRadius: PropTypes.number,
   style: PropTypes.object,
-  progress: PropTypes.number
+  progress: PropTypes.number,
+  handleStroke: PropTypes.number,
+  background: PropTypes.string,
+  gridColor: PropTypes.string,
+  curveColor: PropTypes.string,
+  curveWidth: PropTypes.number,
+  handleColor: PropTypes.string,
+  color: PropTypes.string,
+  textStyle: PropTypes.object,
+  progressColor: PropTypes.string
 };
 
 const defaultProps = {
