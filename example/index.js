@@ -91,7 +91,7 @@ class Example extends React.Component {
     </BezierEditor>
 
       <p>
-        <a style={linkStyle} target="_blank" href={libPackage.home+"/blob/master/example/index.js"}>Source code of these examples.</a>
+        <a style={linkStyle} target="_blank" href={libPackage.homepage+"/blob/master/example/index.js"}>Source code of these examples.</a>
       </p>
 
     </div>;
