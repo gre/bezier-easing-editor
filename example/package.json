@@ -1,0 +1,26 @@
+{
+  "name": "bezier-easing-editor-example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo index.js --live --outfile build.js",
+    "build": "browserify index.js | uglifyjs -c -m > build.js"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel": "^4.7.16",
+    "babelify": "^5.0.4",
+    "browserify": "^9.0.3",
+    "budo": "^2.0.1"
+  },
+  "dependencies": {
+    "raf": "^2.0.4"
+  }
+}
