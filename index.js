@@ -1,5 +1,5 @@
 import React from "react";
-import uncontrollable from "uncontrollable";
+import uncontrollable from "./src/uncontrollable";
 import objectAssign from "object-assign";
 import BezierEasing from "bezier-easing";
 const {PropTypes, Component} = React;
@@ -37,13 +37,12 @@ const propTypes = {
 
 const defaultProps = {
   value: [0.25, 0.25, 0.75, 0.75 ],
-  onChange: function(){},
   width: 300,
   height: 300,
   padding: [25, 5, 25, 18],
   progress: 0,
   background: "#fff",
-  color: "#000",
+  color: "#000", // FIXME what is color?
   gridColor: "#eee",
   curveColor: "#333",
   progressColor: "#ccc",
@@ -208,17 +207,27 @@ class Handle extends BezierComponent {
       handleRadius,
       handleColor,
       hover,
+      down,
+      background,
       handleStroke,
       xval,
-      yval
+      yval,
+      onMouseEnter,
+      onMouseLeave,
+      onMouseDown
     } = this.props;
     return nextProps.index !== index ||
     nextProps.handleRadius !== handleRadius ||
     nextProps.handleColor !== handleColor ||
     nextProps.hover !== hover ||
+    nextProps.down !== down ||
+    nextProps.background !== background ||
     nextProps.handleStroke !== handleStroke ||
     nextProps.xval !== xval ||
-    nextProps.yval !== yval;
+    nextProps.yval !== yval ||
+    nextProps.onMouseDown !== onMouseDown ||
+    nextProps.onMouseLeave !== onMouseLeave ||
+    nextProps.onMouseEnter !== onMouseEnter;
   }
 
   render() {
@@ -228,9 +237,14 @@ class Handle extends BezierComponent {
       handleRadius,
       handleColor,
       hover,
+      down,
+      background,
       handleStroke,
       xval,
-      yval
+      yval,
+      onMouseEnter,
+      onMouseLeave,
+      onMouseDown
     } = this.props;
 
     const sx = x(index);
@@ -244,7 +258,7 @@ class Handle extends BezierComponent {
     return <g>
       <line
         stroke={handleColor}
-        strokeWidth={hover ? 1 + handleStroke : handleStroke}
+        strokeWidth={hover||down ? 1 + handleStroke : handleStroke}
         x1={cxs}
         y1={cys}
         x2={sx}
@@ -254,8 +268,11 @@ class Handle extends BezierComponent {
         cy={cy}
         r={handleRadius}
         stroke={handleColor}
-        strokeWidth={hover ? 2 * handleStroke : handleStroke}
-        fill={handleColor} />
+        strokeWidth={hover||down ? 2 * handleStroke : handleStroke}
+        fill={down ? background: handleColor}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onMouseDown={onMouseDown} />
     </g>;
   }
 }
@@ -306,6 +323,15 @@ class Curve extends BezierComponent {
 
 class Progress extends BezierComponent {
 
+  constructor (props) {
+    super(props);
+    this.genEasing(props.value);
+  }
+
+  genEasing (value) {
+    this.easing = BezierEasing.apply(null, value);
+  }
+
   shouldComponentUpdate(nextProps) {
     if (super.shouldComponentUpdate(nextProps)) return true;
     const {
@@ -318,16 +344,22 @@ class Progress extends BezierComponent {
     nextProps.value !== value;
   }
 
+  componentWillUpdate (props) {
+    if (this.props.value !== props.value) {
+      this.genEasing(props.value);
+    }
+  }
+
   render() {
     const {
-      value,
       progress,
       progressColor
     } = this.props;
+    if (!progress) return <path />;
     const sx = this.x(0);
     const sy = this.y(0);
     const px = this.x(progress);
-    const py = this.y(progress ? BezierEasing.apply(null, value)(progress) : 0);
+    const py = this.y(this.easing ? this.easing(progress) : 0);
     const prog = [
       "M"+[px,sy],
       "L"+[px,py],
@@ -352,10 +384,14 @@ class BezierEditor extends Component {
     this.x = this.x.bind(this);
     this.y = this.y.bind(this);
     this.onDownLeave = this.onDownLeave.bind(this);
-    this.onMouseDown = this.onMouseDown.bind(this);
     this.onDownMove = this.onDownMove.bind(this);
     this.onDownUp = this.onDownUp.bind(this);
-    this.onHoverMove = this.onHoverMove.bind(this);
+    this.onEnterHandle1 = this.onEnterHandle.bind(this, 1);
+    this.onEnterHandle2 = this.onEnterHandle.bind(this, 2);
+    this.onLeaveHandle1 = this.onLeaveHandle.bind(this, 1);
+    this.onLeaveHandle2 = this.onLeaveHandle.bind(this, 2);
+    this.onDownHandle1 = this.onDownHandle.bind(this, 1);
+    this.onDownHandle2 = this.onDownHandle.bind(this, 2);
   }
 
   render () {
@@ -375,7 +411,8 @@ class BezierEditor extends Component {
       handleColor,
       color,
       textStyle,
-      progressColor
+      progressColor,
+      onChange
     } = this.props;
 
     const {
@@ -395,28 +432,36 @@ class BezierEditor extends Component {
       cursor: down ? "move" : hover ? "pointer" : "default"
     }, style);
 
-    var mouseEvents = {
-      onMouseDown: this.onMouseDown
+    const containerEvents = !onChange||!down ? {} : {
+      onMouseMove: this.onDownMove,
+      onMouseUp: this.onDownUp,
+      onMouseLeave: this.onDownLeave
     };
-    if (down) {
-      mouseEvents.onMouseMove = this.onDownMove;
-      mouseEvents.onMouseUp = this.onDownUp;
-      mouseEvents.onMouseLeave = this.onDownLeave;
-    }
-    else {
-      mouseEvents.onMouseMove = this.onHoverMove;
-    }
+    const handle1Events = !onChange||down ? {} : {
+      onMouseDown: this.onDownHandle1,
+      onMouseEnter: this.onEnterHandle1,
+      onMouseLeave: this.onLeaveHandle1
+    };
+    const handle2Events = !onChange||down ? {} : {
+      onMouseDown: this.onDownHandle2,
+      onMouseEnter: this.onEnterHandle2,
+      onMouseLeave: this.onLeaveHandle2
+    };
 
     return <svg
       style={styles}
       width={width}
       height={height}
-      {...mouseEvents}>
+      {...containerEvents}>
       <Grid {...sharedProps} background={background} gridColor={gridColor} textStyle={textStyle} color={color} />
       <Progress {...sharedProps} value={value} progress={progress} progressColor={progressColor} />
       <Curve {...sharedProps} value={value} curveColor={curveColor} curveWidth={curveWidth} />
-      <Handle {...sharedProps} index={0} xval={value[0]} yval={value[1]} handleRadius={handleRadius} handleColor={handleColor} hover={hover===1} handleStroke={handleStroke} />
-      <Handle {...sharedProps} index={1} xval={value[2]} yval={value[3]} handleRadius={handleRadius} handleColor={handleColor} hover={hover===2} handleStroke={handleStroke} />
+      {!onChange ? undefined :
+      <g>
+        <Handle {...sharedProps} {...handle1Events} index={0} xval={value[0]} yval={value[1]} handleRadius={handleRadius} handleColor={handleColor} down={down===1} hover={hover===1} handleStroke={handleStroke} background={background} />
+        <Handle {...sharedProps} {...handle2Events} index={1} xval={value[2]} yval={value[3]} handleRadius={handleRadius} handleColor={handleColor} down={down===2} hover={hover===2} handleStroke={handleStroke} background={background} />
+      </g>
+      }
       {this.props.children}
     </svg>;
   }
@@ -430,22 +475,26 @@ class BezierEditor extends Component {
     }
   }
 
-  onHoverMove (e) {
-    const hover = this.handleForEvent(e);
-    if (hover !== this.state.hover) {
+  onDownHandle (h, e) {
+    e.preventDefault();
+    this.setState({
+      hover: null,
+      down: h
+    });
+  }
+
+  onEnterHandle (h) {
+    if (!this.state.down) {
       this.setState({
-        hover: hover
+        hover: h
       });
     }
   }
 
-  onMouseDown (e) {
-    const down = this.handleForEvent(e);
-    if (down) {
-      e.preventDefault();
+  onLeaveHandle () {
+    if (!this.state.down) {
       this.setState({
-        down: down,
-        hover: 0
+        hover: null
       });
     }
   }
@@ -462,8 +511,8 @@ class BezierEditor extends Component {
     }
   }
 
-  onDownUp (e) {
-    this.onDownMove(e);
+  onDownUp () {
+    // this.onDownMove(e);
     this.setState({
       down: 0
     });
@@ -475,28 +524,6 @@ class BezierEditor extends Component {
       e.clientX - rect.left,
       e.clientY - rect.top
     ];
-  }
-
-  handleForEvent (e) {
-    const {
-      handleRadius,
-      value
-    } = this.props;
-    const hover = this.state.hover;
-    const [ x, y ] = this.positionForEvent(e);
-    const r = 1 + handleRadius * (hover ? 2 : 1);
-    const handleRadius2 = r * r;
-    const x1 = this.x(value[0]) - x;
-    const y1 = this.y(value[1]) - y;
-    if (x1*x1 + y1*y1 <= handleRadius2) {
-      return 1;
-    }
-    const x2 = this.x(value[2]) - x;
-    const y2 = this.y(value[3]) - y;
-    if (x2*x2 + y2*y2 <= handleRadius2) {
-      return 2;
-    }
-    return 0;
   }
 
   x (value) {

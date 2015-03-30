@@ -90,9 +90,52 @@ class Example extends React.Component {
       <text x={0} y={16} fill="#33a">Uncontrolled Bezier Editor</text>
     </BezierEditor>
 
-      <p>
-        <a style={linkStyle} target="_blank" href={libPackage.homepage+"/blob/master/example/index.js"}>Source code of these examples.</a>
-      </p>
+    <br />
+
+    <BezierEditor
+      style={bezierStyle}
+      value={value}
+      progress={progress}
+      width={200}
+      height={200}
+      progressColor="#fa0">
+      <text x={0} y={16} fill="#fa0">Read-Only</text>
+    </BezierEditor>
+
+
+    <BezierEditor
+      style={bezierStyle}
+      value={value}
+      width={200}
+      height={200}>
+      <text x={0} y={16} fill="#fa0">Read-Only, no progress</text>
+    </BezierEditor>
+
+
+    <BezierEditor
+      style={bezierStyle}
+      value={value}
+      onChange={this.onChange}
+      progress={progress}
+      width={200}
+      height={200}
+      background="#888"
+      color="#fff"
+      gridColor="#777"
+      curveColor="#0ff"
+      progressColor="#666"
+      handleColor="#000"
+      textStyle={{
+        fontFamily: "monospace",
+        fontSize: "9px",
+        fill: "#000"
+      }}>
+      <text x={50} y={16} fill="#0ff">different styles</text>
+    </BezierEditor>
+
+    <p>
+      <a style={linkStyle} target="_blank" href={libPackage.homepage+"/blob/master/example/index.js"}>Source code of these examples.</a>
+    </p>
 
     </div>;
   }
