@@ -24,7 +24,8 @@ const propTypes = {
   handleColor: PropTypes.string,
   color: PropTypes.string,
   textStyle: PropTypes.object,
-  progressColor: PropTypes.string
+  progressColor: PropTypes.string,
+  readOnly: PropTypes.bool
 };
 
 const defaultProps = {
@@ -86,7 +87,8 @@ export default class BezierEditor extends Component {
       handleColor,
       textStyle,
       progressColor,
-      onChange
+      onChange,
+      readOnly
     } = this.props;
 
     const {
@@ -106,17 +108,17 @@ export default class BezierEditor extends Component {
       cursor: down ? "move" : hover ? "pointer" : "default"
     }, style);
 
-    const containerEvents = !onChange||!down ? {} : {
+    const containerEvents = readOnly||!down ? {} : {
       onMouseMove: this.onDownMove,
       onMouseUp: this.onDownUp,
       onMouseLeave: this.onDownLeave
     };
-    const handle1Events = !onChange||down ? {} : {
+    const handle1Events = readOnly||down ? {} : {
       onMouseDown: this.onDownHandle1,
       onMouseEnter: this.onEnterHandle1,
       onMouseLeave: this.onLeaveHandle1
     };
-    const handle2Events = !onChange||down ? {} : {
+    const handle2Events = readOnly||down ? {} : {
       onMouseDown: this.onDownHandle2,
       onMouseEnter: this.onEnterHandle2,
       onMouseLeave: this.onLeaveHandle2
@@ -130,7 +132,7 @@ export default class BezierEditor extends Component {
       <Grid {...sharedProps} background={background} gridColor={gridColor} textStyle={textStyle} />
       <Progress {...sharedProps} value={value} progress={progress} progressColor={progressColor} />
       <Curve {...sharedProps} value={value} curveColor={curveColor} curveWidth={curveWidth} />
-      {!onChange ? undefined :
+      {readOnly ? undefined :
       <g>
         <Handle {...sharedProps} {...handle1Events} index={0} xval={value[0]} yval={value[1]} handleRadius={handleRadius} handleColor={handleColor} down={down===1} hover={hover===1} handleStroke={handleStroke} background={background} />
         <Handle {...sharedProps} {...handle2Events} index={1} xval={value[2]} yval={value[3]} handleRadius={handleRadius} handleColor={handleColor} down={down===2} hover={hover===2} handleStroke={handleStroke} background={background} />

@@ -95,10 +95,12 @@ class Example extends React.Component {
     <BezierEditor
       style={bezierStyle}
       value={value}
+      onChange={this.onChange}
       progress={progress}
       width={200}
       height={200}
-      progressColor="#fa0">
+      progressColor="#fa0"
+      readOnly>
       <text x={0} y={16} fill="#fa0">Read-Only</text>
     </BezierEditor>
 
@@ -106,8 +108,10 @@ class Example extends React.Component {
     <BezierEditor
       style={bezierStyle}
       value={value}
+      onChange={this.onChange}
       width={200}
-      height={200}>
+      height={200}
+      readOnly>
       <text x={0} y={16} fill="#fa0">Read-Only, no progress</text>
     </BezierEditor>
 
