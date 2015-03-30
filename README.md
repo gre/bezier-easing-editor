@@ -7,7 +7,7 @@ Cubic Bezier Curve editor made with React & SVG.
 ## Example
 
 [(click to open)
-![](https://cloud.githubusercontent.com/assets/211411/6886919/d5925f40-d64f-11e4-9eb3-a6e2cf47018b.png)
+![](https://cloud.githubusercontent.com/assets/211411/6906945/5678cf8a-d732-11e4-8439-9587271a4406.png)
 ](http://gre.github.io/bezier-easing-editor/example/)
 
 Controlled / Uncontrolled Component
