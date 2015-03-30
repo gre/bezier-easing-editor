@@ -1,6 +1,6 @@
 {
   "name": "bezier-easing-editor",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Cubic Bezier Curve editor made with React & SVG",
   "main": "index.js",
   "peerDependencies": {
