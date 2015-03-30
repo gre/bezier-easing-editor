@@ -9,6 +9,17 @@ function range (from, to, step) {
   return t;
 }
 
+function sameShadowObject (a, b) {
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+  for (let i in a) {
+    if (a[i] !== b[i])
+      return false;
+  }
+  return true;
+}
+
 export default class Grid extends BezierComponent {
 
   gridX (div) {
@@ -30,7 +41,7 @@ export default class Grid extends BezierComponent {
     } = this.props;
     return nextProps.background !== background ||
       nextProps.gridColor !== gridColor ||
-      nextProps.textStyle !== textStyle;
+      !sameShadowObject(nextProps.textStyle, textStyle);
   }
 
   render() {
