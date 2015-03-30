@@ -46,6 +46,11 @@ const defaultProps = {
   textStyle: {
     fontFamily: "sans-serif",
     fontSize: "10px"
+  },
+  pointers: {
+    down: "none",
+    hover: "pointer",
+    def: "default"
   }
 };
 
@@ -87,7 +92,8 @@ export default class BezierEditor extends Component {
       handleColor,
       textStyle,
       progressColor,
-      readOnly
+      readOnly,
+      pointers
     } = this.props;
 
     const {
@@ -102,9 +108,11 @@ export default class BezierEditor extends Component {
       yTo: y(1)
     };
 
+    const cursor = objectAssign({}, propTypes.pointers, pointers);
+
     const styles = objectAssign({
       background: background,
-      cursor: down ? "move" : hover ? "pointer" : "default",
+      cursor: down ? cursor.down : hover ? cursor.hover : cursor.def,
       userSelect: "none",
       WebkitUserSelect: "none",
       MozUserSelect: "none"
@@ -134,13 +142,13 @@ export default class BezierEditor extends Component {
       <Grid {...sharedProps} background={background} gridColor={gridColor} textStyle={objectAssign({}, defaultProps.textStyle, textStyle)} />
       <Progress {...sharedProps} value={value} progress={progress} progressColor={progressColor} />
       <Curve {...sharedProps} value={value} curveColor={curveColor} curveWidth={curveWidth} />
+      {this.props.children}
       {readOnly ? undefined :
       <g>
         <Handle {...sharedProps} {...handle1Events} index={0} xval={value[0]} yval={value[1]} handleRadius={handleRadius} handleColor={handleColor} down={down===1} hover={hover===1} handleStroke={handleStroke} background={background} />
         <Handle {...sharedProps} {...handle2Events} index={1} xval={value[2]} yval={value[3]} handleRadius={handleRadius} handleColor={handleColor} down={down===2} hover={hover===2} handleStroke={handleStroke} background={background} />
       </g>
       }
-      {this.props.children}
     </svg>;
   }
 
@@ -223,8 +231,14 @@ export default class BezierEditor extends Component {
   }
 
   inversey (y) {
-    const padding = this.props.padding;
-    const h = this.props.height - padding[0] - padding[2];
+    const {
+      height,
+      handleRadius,
+      padding
+    } = this.props;
+    const clampMargin = 2 * handleRadius;
+    const h = height - padding[0] - padding[2];
+    y = Math.max(clampMargin, Math.min(y, height - clampMargin));
     return 1 - (y - padding[0]) / h;
   }
 }
