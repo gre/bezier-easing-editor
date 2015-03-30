@@ -23,7 +23,7 @@ to enable the edition.
 `bezier-easing-editor` allows to be **Uncontrolled**:
 just define a `defaultValue`:
 ```jsx
-<BezierEditor defaultValue={[0.2, 0.2, 0.8, 0.8]} />
+<BezierEditor defaultValue={[0.2, 0.2, 0.8, 0.8]} onChange={console.log.bind(console)} />
 ```
 
 See also
