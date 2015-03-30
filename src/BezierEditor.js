@@ -87,7 +87,6 @@ export default class BezierEditor extends Component {
       handleColor,
       textStyle,
       progressColor,
-      onChange,
       readOnly
     } = this.props;
 
@@ -105,7 +104,10 @@ export default class BezierEditor extends Component {
 
     const styles = objectAssign({
       background: background,
-      cursor: down ? "move" : hover ? "pointer" : "default"
+      cursor: down ? "move" : hover ? "pointer" : "default",
+      userSelect: "none",
+      WebkitUserSelect: "none",
+      MozUserSelect: "none"
     }, style);
 
     const containerEvents = readOnly||!down ? {} : {
@@ -129,7 +131,7 @@ export default class BezierEditor extends Component {
       width={width}
       height={height}
       {...containerEvents}>
-      <Grid {...sharedProps} background={background} gridColor={gridColor} textStyle={textStyle} />
+      <Grid {...sharedProps} background={background} gridColor={gridColor} textStyle={objectAssign({}, defaultProps.textStyle, textStyle)} />
       <Progress {...sharedProps} value={value} progress={progress} progressColor={progressColor} />
       <Curve {...sharedProps} value={value} curveColor={curveColor} curveWidth={curveWidth} />
       {readOnly ? undefined :

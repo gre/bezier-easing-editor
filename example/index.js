@@ -80,14 +80,16 @@ class Example extends React.Component {
         onChange={this.onChange}
         style={bezierStyle}
         progress={progress}
-        curveColor="#0cc"
-        gridColor="#dee"
-        color="#33a"
-        handleColor="#33a"
-        progressColor="#0cc"
+        curveColor="#0af"
+        gridColor="#eee"
+        handleColor="#000"
+        progressColor="#0af"
+        textStyle={{
+          fill: "#9df"
+        }}
         padding={[ 50, 50, 50, 50]}
       >
-      <text x={0} y={16} fill="#33a">Uncontrolled Bezier Editor</text>
+      <text x={0} y={16} fill="#0af">Uncontrolled Bezier Editor</text>
     </BezierEditor>
 
     <br />
@@ -99,9 +101,10 @@ class Example extends React.Component {
       progress={progress}
       width={200}
       height={200}
-      progressColor="#fa0"
+      progressColor="#0af"
+      curveColor="#0af"
       readOnly>
-      <text x={0} y={16} fill="#fa0">Read-Only</text>
+      <text x={0} y={16} fill="#0af">Read-Only</text>
     </BezierEditor>
 
 
@@ -112,7 +115,7 @@ class Example extends React.Component {
       width={200}
       height={200}
       readOnly>
-      <text x={0} y={16} fill="#fa0">Read-Only, no progress</text>
+      <text x={0} y={16} fill="#000">Read-Only, no progress</text>
     </BezierEditor>
 
 
@@ -123,18 +126,17 @@ class Example extends React.Component {
       progress={progress}
       width={200}
       height={200}
-      background="#888"
-      color="#fff"
-      gridColor="#777"
-      curveColor="#0ff"
-      progressColor="#666"
+      background="#777"
+      gridColor="#666"
+      progressColor="#555"
+      curveColor="#fc5"
       handleColor="#000"
       textStyle={{
         fontFamily: "monospace",
         fontSize: "9px",
-        fill: "#000"
+        fill: "#222"
       }}>
-      <text x={50} y={16} fill="#0ff">different styles</text>
+      <text x={50} y={16} fill="#fc5">different styles</text>
     </BezierEditor>
 
     <p>
@@ -147,6 +149,6 @@ class Example extends React.Component {
 
 document.body.style.padding = "0px 20px";
 document.body.style.color = "#333";
-document.body.style.background = "#eee";
+document.body.style.background = "#fff";
 document.body.style.fontFamily = "sans-serif";
 React.render(<Example />, document.body);
