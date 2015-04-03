@@ -1,6 +1,6 @@
 {
   "name": "bezier-easing-editor",
-  "version": "0.3.4",
+  "version": "0.4.0",
   "description": "Cubic Bezier Curve editor made with React & SVG",
   "main": "src/index.js",
   "peerDependencies": {
@@ -28,8 +28,7 @@
     "url": "https://github.com/gre/bezier-easing-editor/issues"
   },
   "homepage": "https://github.com/gre/bezier-easing-editor",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "babelify": "^5.0.4",
     "bezier-easing": "^0.4.4",
