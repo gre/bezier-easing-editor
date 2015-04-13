@@ -23,7 +23,7 @@
     "editor"
   ],
   "author": "Gaëtan Renaudeau",
-  "license": "ISC",
+  "license": "GPLv3",
   "bugs": {
     "url": "https://github.com/gre/bezier-easing-editor/issues"
   },
