@@ -72,27 +72,27 @@ export default class Grid extends BezierComponent {
 
     const tenth =
       xtenth
-      .map(xp => [ "M"+[xp,sy], "L"+[xp,ey] ] )
-      .concat(ytenth.map(yp => [ "M"+[sx,yp], "L"+[ex,yp] ]))
+      .map(xp => `M${xp},${sy} L${xp},${ey}`)
+      .concat(ytenth.map(yp => `M${sx},${yp} L${ex},${yp}`))
       .join(" ");
 
     const half =
       xhalf
-      .map(xp => [ "M"+[xp,sy], "L"+[xp,ey] ])
-      .concat(yhalf.map(yp => [ "M"+[sx,yp], "L"+[ex,yp] ]))
-      .concat([ "M"+[sx,sy], "L"+[ex,ey] ])
+      .map(xp => `M${xp},${sy} L${xp},${ey}`)
+      .concat(yhalf.map(yp => `M${sx},${yp} L${ex},${yp}`))
+      .concat([ "M"+[sx,sy]+" L"+[ex,ey] ])
       .join(" ");
 
     const ticksLeft =
       ytenth.map( (yp, i) => {
         const w = 3 + (i % 5 === 0 ? 2 : 0);
-        return [ "M"+[sx,yp], "L"+[sx-w,yp] ];
+        return `M${sx},${yp} L${sx-w},${yp}`;
       }).join(" ");
 
     const ticksBottom =
       xtenth.map((xp, i) => {
         const h = 3 + (i % 5 === 0 ? 2 : 0);
-        return [ "M"+[xp,sy], "L"+[xp,sy+h] ];
+        return `M${xp},${sy} L${xp},${sy+h}`;
       }).join(" ");
 
     return <g>
