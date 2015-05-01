@@ -30,12 +30,7 @@ export default class Curve extends BezierComponent {
     const cy1 = y(value[1]);
     const cx2 = x(value[2]);
     const cy2 = y(value[3]);
-    const curve = [
-      "M"+[sx,sy],
-      "C"+[cx1,cy1],
-      ""+[cx2,cy2],
-      ""+[ex,ey]
-    ].join(" ");
+    const curve = `M${sx},${sy} C${cx1},${cy1} ${cx2},${cy2} ${ex},${ey}`;
 
     return <path
       fill="none"

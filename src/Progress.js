@@ -41,11 +41,7 @@ export default class Progress extends BezierComponent {
     const sy = this.y(0);
     const px = this.x(progress);
     const py = this.y(this.easing ? this.easing(progress) : 0);
-    const prog = [
-      "M"+[px,sy],
-      "L"+[px,py],
-      "L"+[sx,py]
-    ].join(" ");
+    const prog = `M${px},${sy} L${px},${py} L${sx},${py}`;
     return <path
       fill="none"
       strokeWidth="1px"

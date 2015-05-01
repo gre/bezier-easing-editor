@@ -62,13 +62,8 @@ export default class Grid extends BezierComponent {
     const xtenth = this.gridX(10);
     const ytenth = this.gridY(10);
 
-    const gridbg = [
-      "M"+[sx,sy],
-      "L"+[sx,ey],
-      "L"+[ex,ey],
-      "L"+[ex,sy],
-      "Z"
-    ].join(" ");
+    const gridbg =
+      `M${sx},${sy} L${sx},${ey} L${ex},${ey} L${ex},${sy} Z`;
 
     const tenth =
       xtenth
@@ -80,7 +75,7 @@ export default class Grid extends BezierComponent {
       xhalf
       .map(xp => `M${xp},${sy} L${xp},${ey}`)
       .concat(yhalf.map(yp => `M${sx},${yp} L${ex},${yp}`))
-      .concat([ "M"+[sx,sy]+" L"+[ex,ey] ])
+      .concat([ `M${sx},${sy} L${ex},${ey}` ])
       .join(" ");
 
     const ticksLeft =
