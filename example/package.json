@@ -18,9 +18,11 @@
     "babel": "^4.7.16",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
-    "budo": "^2.0.1"
+    "budo": "^2.0.1",
+    "watchify": "^3.4.0"
   },
   "dependencies": {
+    "bezier-easing-editor": "file:..",
     "raf": "^2.0.4"
   }
 }

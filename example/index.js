@@ -1,5 +1,5 @@
 import React from "react/addons";
-import BezierEditor from "..";
+import BezierEditor from "bezier-easing-editor";
 import libPackage from "../package.json";
 import raf from "raf";
 
