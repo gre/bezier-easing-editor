@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "budo index.js --live --outfile build.js",
+    "start": "budo index.js:build.js --live",
     "build": "browserify index.js | uglifyjs -c -m > build.js"
   },
   "browserify": {
@@ -15,14 +15,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "babel": "^4.7.16",
-    "babelify": "^5.0.4",
-    "browserify": "^9.0.3",
-    "budo": "^2.0.1",
+    "babelify": "^6.3.0",
+    "browserify": "^11.1.0",
+    "budo": "^4.2.2",
     "watchify": "^3.4.0"
   },
   "dependencies": {
     "bezier-easing-editor": "file:..",
-    "raf": "^2.0.4"
+    "raf": "^3.1.0"
   }
 }
