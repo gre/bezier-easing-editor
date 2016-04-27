@@ -24,14 +24,20 @@ class Example extends React.Component {
       progress: 0
     };
     this.onChange = this.onChange.bind(this);
+  }
 
+  componentDidMount() {
     const loop = (t) => {
-      raf(loop);
+      this._loopId = raf(loop);
       this.setState({
         progress: (t/2000) % 1
       });
     };
-    raf(loop);
+    this._loopId = raf(loop);
+  }
+
+  componentWillUnmount() {
+    raf.cancel(this._loopId);
   }
 
   onChange(value) {
