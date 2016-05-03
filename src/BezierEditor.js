@@ -1,4 +1,5 @@
 import React from "react";
+import {findDOMNode} from "react-dom";
 import objectAssign from "object-assign";
 const {PropTypes, Component} = React;
 
@@ -205,7 +206,7 @@ export default class BezierEditor extends Component {
   }
 
   positionForEvent (e) {
-    const rect = React.findDOMNode(this).getBoundingClientRect();
+    const rect = findDOMNode(this).getBoundingClientRect();
     return [
       e.clientX - rect.left,
       e.clientY - rect.top
