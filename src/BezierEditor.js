@@ -9,7 +9,6 @@ import Progress from "./Progress";
 import Curve from "./Curve";
 
 const propTypes = {
-  value: PropTypes.array,
   onChange: PropTypes.func,
   width: PropTypes.number,
   height: PropTypes.number,
