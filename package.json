@@ -2,15 +2,20 @@
   "name": "bezier-easing-editor",
   "version": "0.5.0",
   "description": "Cubic Bezier Curve editor made with React & SVG",
-  "main": "src/index.js",
-  "peerDependencies": {
-    "react": "^0.14 || ^15.0",
-    "react-dom": "^0.14 || ^15.0"
+  "main": "lib/index.js",
+  "files": [
+    "src",
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "compile": "rm -rf lib/ && babel --presets es2015,stage-1,react --source-maps -d lib src",
+    "prepublish": "npm run compile"
   },
-  "browserify": {
-    "transform": [
-      "babelify"
-    ]
+  "peerDependencies": {
+    "react": "*",
+    "react-dom": "*"
   },
   "repository": {
     "type": "git",
@@ -29,11 +34,15 @@
     "url": "https://github.com/gre/bezier-easing-editor/issues"
   },
   "homepage": "https://github.com/gre/bezier-easing-editor",
-  "devDependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "babel-preset-stage-1": "^6.16.0"
+  },
   "dependencies": {
-    "babelify": "^6.3.0",
-    "bezier-easing": "^1.1.1",
-    "object-assign": "^4.0.1",
-    "uncontrollable": "^3.1.2"
+    "bezier-easing": "^2.0.3",
+    "object-assign": "^4.1.0",
+    "uncontrollable": "^4.0.3"
   }
 }

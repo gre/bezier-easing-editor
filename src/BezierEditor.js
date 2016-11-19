@@ -16,6 +16,7 @@ const propTypes = {
   padding: PropTypes.array,
   handleRadius: PropTypes.number,
   style: PropTypes.object,
+  className: PropTypes.string,
   progress: PropTypes.number,
   handleStroke: PropTypes.number,
   background: PropTypes.string,
@@ -84,6 +85,7 @@ export default class BezierEditor extends Component {
       height,
       handleRadius,
       style,
+      className,
       progress,
       handleStroke,
       background,
@@ -94,7 +96,7 @@ export default class BezierEditor extends Component {
       textStyle,
       progressColor,
       readOnly,
-      pointers
+      pointers,
     } = this.props;
 
     const {
@@ -136,6 +138,7 @@ export default class BezierEditor extends Component {
     };
 
     return <svg
+      className={className}
       style={styles}
       width={width}
       height={height}

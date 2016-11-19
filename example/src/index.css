@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0 20px;
+  color: #333;
+  background: #fff;
+  font-family: sans-serif;
+}
+
+a {
+  color: #3c6;
+  text-decoration: none;
+}
+
+h2 {
+  color: #aaa;
+  font-weight: normal;
+}
+
+.bezier {
+  display: inline-block;
+  margin: 5px;
+}
