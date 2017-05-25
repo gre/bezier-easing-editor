@@ -11,11 +11,11 @@
   ],
   "scripts": {
     "compile": "rm -rf lib/ && babel --presets es2015,stage-1,react --source-maps -d lib src",
+    "watch": "babel --presets es2015,stage-1,react --source-maps -w -d lib src",
     "prepublish": "npm run compile"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-dom": "*"
+    "react": "*"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,7 @@
     "editor"
   ],
   "author": "Gaëtan Renaudeau",
-  "license": "GPLv3",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/gre/bezier-easing-editor/issues"
   },
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "bezier-easing": "^2.0.3",
-    "object-assign": "^4.1.0",
-    "uncontrollable": "^4.0.3"
+    "prop-types": "^15.5.10",
+    "uncontrollable": "^4.1.0"
   }
 }
