@@ -5,4 +5,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "/bezier-easing-editor/",
   plugins: [react()],
+  resolve: {
+    // bezier-easing-editor is symlinked (file:..), so its "react" import
+    // resolves to the parent repo's node_modules: dedupe to avoid bundling
+    // two React copies (hooks crash with a null dispatcher otherwise)
+    dedupe: ["react", "react-dom"],
+  },
 });
