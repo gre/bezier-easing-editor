@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { PointerEventHandler } from "react";
 import { projectX, projectY, type Projection } from "./types";
 
@@ -33,6 +33,18 @@ function Handle(props: HandleProps) {
     onPointerLeave,
   } = props;
 
+  // touch-action is ignored on SVG children by some browsers (iOS Safari) and
+  // React registers touch listeners as passive: preventing the scroll on
+  // handle touches requires a native non-passive touchstart listener
+  const hitRef = useRef<SVGCircleElement>(null);
+  useEffect(() => {
+    const el = hitRef.current;
+    if (!el) return;
+    const onTouchStart = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    return () => el.removeEventListener("touchstart", onTouchStart);
+  }, []);
+
   const sx = projectX(props, index);
   const sy = projectY(props, index);
   const cx = projectX(props, xval);
@@ -59,8 +71,8 @@ function Handle(props: HandleProps) {
         strokeWidth={hover || down ? 2 * handleStroke : handleStroke}
         fill={down ? background : handleColor}
       />
-      {/* invisible hit area, larger than the visible handle for touch */}
       <circle
+        ref={hitRef}
         data-handle={index}
         cx={cx}
         cy={cy}

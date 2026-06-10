@@ -84,20 +84,29 @@ export default function BezierEditor({
   const isControlled = controlledValue !== undefined;
   const value = isControlled ? controlledValue : uncontrolledValue;
 
-  const [down, setDown] = useState<0 | 1 | 2>(0);
   const [hover, setHover] = useState<0 | 1 | 2>(0);
+  const [dragVersion, setDragVersion] = useState(0);
   const rootRef = useRef<SVGSVGElement>(null);
+  const dragsRef = useRef(new Map<number, 1 | 2>());
 
-  // Latest state for the window pointermove handler, so the drag effect
-  // doesn't need to re-subscribe on every value change.
-  const latest = useRef({ value, padding, width, height, handleRadius, onChange, isControlled });
-  latest.current = { value, padding, width, height, handleRadius, onChange, isControlled };
+  // refs so the window listeners always see the latest props, and so two
+  // pointermove events in the same frame don't overwrite each other's change
+  const latest = useRef({ padding, width, height, handleRadius, onChange, isControlled });
+  latest.current = { padding, width, height, handleRadius, onChange, isControlled };
+  const valueRef = useRef(value);
+  valueRef.current = value;
+
+  const down1 = [...dragsRef.current.values()].includes(1);
+  const down2 = [...dragsRef.current.values()].includes(2);
+  const anyDown = down1 || down2;
 
   useEffect(() => {
-    if (!down) return;
+    if (!anyDown) return;
     const onPointerMove = (e: PointerEvent) => {
+      const handle = dragsRef.current.get(e.pointerId);
+      if (!handle) return;
       e.preventDefault();
-      const { value, padding, width, height, handleRadius, onChange, isControlled } =
+      const { padding, width, height, handleRadius, onChange, isControlled } =
         latest.current;
       const rect = rootRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -112,34 +121,45 @@ export default function BezierEditor({
       const cy = Math.max(clampMargin, Math.min(py, height - clampMargin));
       const yval = 1 - (cy - padding[0]) / h;
 
-      const next = value.slice() as BezierValue;
-      const i = 2 * (down - 1);
+      const next = valueRef.current.slice() as BezierValue;
+      const i = 2 * (handle - 1);
       next[i] = xval;
       next[i + 1] = yval;
+      valueRef.current = next;
       if (!isControlled) setUncontrolledValue(next);
       onChange?.(next);
     };
-    const onPointerUp = () => setDown(0);
+    const onPointerEnd = (e: PointerEvent) => {
+      if (dragsRef.current.delete(e.pointerId)) {
+        setDragVersion((v) => v + 1);
+      }
+    };
     window.addEventListener("pointermove", onPointerMove);
-    window.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("pointercancel", onPointerUp);
+    window.addEventListener("pointerup", onPointerEnd);
+    window.addEventListener("pointercancel", onPointerEnd);
     return () => {
       window.removeEventListener("pointermove", onPointerMove);
-      window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointercancel", onPointerUp);
+      window.removeEventListener("pointerup", onPointerEnd);
+      window.removeEventListener("pointercancel", onPointerEnd);
     };
-  }, [down]);
+  }, [anyDown, dragVersion]);
 
-  const onDownHandle1 = useCallback((e: React.PointerEvent) => {
+  const beginDrag = useCallback((handle: 1 | 2, e: React.PointerEvent) => {
     e.preventDefault();
+    const drags = dragsRef.current;
+    if ([...drags.values()].includes(handle)) return;
+    drags.set(e.pointerId, handle);
     setHover(0);
-    setDown(1);
+    setDragVersion((v) => v + 1);
   }, []);
-  const onDownHandle2 = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    setHover(0);
-    setDown(2);
-  }, []);
+  const onDownHandle1 = useCallback(
+    (e: React.PointerEvent) => beginDrag(1, e),
+    [beginDrag]
+  );
+  const onDownHandle2 = useCallback(
+    (e: React.PointerEvent) => beginDrag(2, e),
+    [beginDrag]
+  );
   const onEnterHandle1 = useCallback(() => setHover((h) => h || 1), []);
   const onEnterHandle2 = useCallback(() => setHover((h) => h || 2), []);
   const onLeaveHandle = useCallback(() => setHover(0), []);
@@ -164,26 +184,27 @@ export default function BezierEditor({
 
   const styles: CSSProperties = {
     background,
-    cursor: down ? cursor.down : hover ? cursor.hover : cursor.def,
+    cursor: anyDown ? cursor.down : hover ? cursor.hover : cursor.def,
     userSelect: "none",
     ...style,
   };
 
-  const interactive = !readOnly && !down;
-  const handle1Events = interactive
-    ? {
-        onPointerDown: onDownHandle1,
-        onPointerEnter: onEnterHandle1,
-        onPointerLeave: onLeaveHandle,
-      }
-    : {};
-  const handle2Events = interactive
-    ? {
-        onPointerDown: onDownHandle2,
-        onPointerEnter: onEnterHandle2,
-        onPointerLeave: onLeaveHandle,
-      }
-    : {};
+  const handle1Events =
+    readOnly || down1
+      ? {}
+      : {
+          onPointerDown: onDownHandle1,
+          onPointerEnter: onEnterHandle1,
+          onPointerLeave: onLeaveHandle,
+        };
+  const handle2Events =
+    readOnly || down2
+      ? {}
+      : {
+          onPointerDown: onDownHandle2,
+          onPointerEnter: onEnterHandle2,
+          onPointerLeave: onLeaveHandle,
+        };
 
   return (
     <svg
@@ -224,7 +245,7 @@ export default function BezierEditor({
             handleColor={handleColor}
             handleStroke={handleStroke}
             background={background}
-            down={down === 1}
+            down={down1}
             hover={hover === 1}
           />
           <Handle
@@ -237,7 +258,7 @@ export default function BezierEditor({
             handleColor={handleColor}
             handleStroke={handleStroke}
             background={background}
-            down={down === 2}
+            down={down2}
             hover={hover === 2}
           />
         </g>

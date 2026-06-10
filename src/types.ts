@@ -9,10 +9,7 @@ export type BezierValue = [number, number, number, number];
  */
 export type Padding = [number, number, number, number];
 
-/**
- * Pixel-space projection shared by the SVG sub-components.
- * Maps the unit interval to pixel coordinates of the grid corners.
- */
+/** Pixel coordinates of the grid corners, mapping the unit interval. */
 export interface Projection {
   xFrom: number;
   yFrom: number;

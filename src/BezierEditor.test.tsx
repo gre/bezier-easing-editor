@@ -11,13 +11,24 @@ function getHandles(container: HTMLElement) {
   );
 }
 
-// jsdom has no real PointerEvent: fireEvent.pointerMove drops clientX/clientY.
-// Dispatch MouseEvent-backed events with pointer event types instead.
-function pointerMove(clientX: number, clientY: number) {
-  fireEvent(window, new MouseEvent("pointermove", { clientX, clientY }));
+// jsdom has no real PointerEvent: back pointer events with MouseEvent and
+// attach an explicit pointerId
+function pointerEvent(type: string, pointerId: number, init: MouseEventInit = {}) {
+  const e = new MouseEvent(type, { bubbles: true, cancelable: true, ...init });
+  Object.defineProperty(e, "pointerId", { value: pointerId });
+  return e;
 }
-function pointerUp() {
-  fireEvent(window, new MouseEvent("pointerup"));
+function pointerDown(el: Element, pointerId = 1) {
+  fireEvent(el, pointerEvent("pointerdown", pointerId));
+}
+function pointerMove(clientX: number, clientY: number, pointerId = 1) {
+  fireEvent(window, pointerEvent("pointermove", pointerId, { clientX, clientY }));
+}
+function pointerUp(pointerId = 1) {
+  fireEvent(window, pointerEvent("pointerup", pointerId));
+}
+function pointerCancel(pointerId = 1) {
+  fireEvent(window, pointerEvent("pointercancel", pointerId));
 }
 
 describe("BezierEditor", () => {
@@ -47,7 +58,6 @@ describe("BezierEditor", () => {
     const paths = Array.from(container.querySelectorAll("path"));
     const curve = paths.find((p) => p.getAttribute("d")?.includes("C"));
     expect(curve).toBeDefined();
-    // x1=0 maps to left edge (padding-left = 18), y1=1 maps to top (padding-top = 25)
     expect(curve!.getAttribute("d")).toContain("C18,25");
   });
 
@@ -75,18 +85,15 @@ describe("BezierEditor", () => {
       <BezierEditor value={value} onChange={onChange} />
     );
     const [handle1] = getHandles(container);
-    fireEvent.pointerDown(handle1);
+    pointerDown(handle1);
     pointerMove(100, 100);
     expect(onChange).toHaveBeenCalledTimes(1);
     const next = onChange.mock.calls[0][0] as BezierValue;
     expect(next).toHaveLength(4);
-    // only the first control point moved
     expect(next[2]).toBe(0.75);
     expect(next[3]).toBe(0.75);
-    // x is clamped to [0,1]
     expect(next[0]).toBeGreaterThanOrEqual(0);
     expect(next[0]).toBeLessThanOrEqual(1);
-    // original value is not mutated
     expect(value).toEqual([0.25, 0.25, 0.75, 0.75]);
     pointerUp();
   });
@@ -97,7 +104,7 @@ describe("BezierEditor", () => {
       <BezierEditor value={[0.25, 0.25, 0.75, 0.75]} onChange={onChange} />
     );
     const [, handle2] = getHandles(container);
-    fireEvent.pointerDown(handle2);
+    pointerDown(handle2);
     pointerMove(50, 50);
     pointerUp();
     onChange.mockClear();
@@ -116,7 +123,7 @@ describe("BezierEditor", () => {
         .getAttribute("d");
     const before = curveD();
     const [handle1] = getHandles(container);
-    fireEvent.pointerDown(handle1);
+    pointerDown(handle1);
     pointerMove(200, 200);
     pointerUp();
     expect(onChange).toHaveBeenCalled();
@@ -129,22 +136,64 @@ describe("BezierEditor", () => {
       <BezierEditor value={[0.25, 0.25, 0.75, 0.75]} onChange={onChange} />
     );
     const [handle1] = getHandles(container);
-    // the invisible hit area must be comfortably larger than the visible handle
     expect(Number(handle1.getAttribute("r"))).toBeGreaterThanOrEqual(22);
     expect(handle1.style.touchAction).toBe("none");
-    fireEvent.pointerDown(handle1, { pointerType: "touch" });
-    fireEvent(
-      window,
-      new MouseEvent("pointermove", { clientX: 120, clientY: 80 })
-    );
+    // touches starting on the handle must not scroll the page: the native
+    // non-passive touchstart listener prevents the default action
+    const touchStart = new Event("touchstart", {
+      bubbles: true,
+      cancelable: true,
+    });
+    handle1.dispatchEvent(touchStart);
+    expect(touchStart.defaultPrevented).toBe(true);
+    pointerDown(handle1);
+    pointerMove(120, 80);
     expect(onChange).toHaveBeenCalledTimes(1);
-    fireEvent(window, new MouseEvent("pointercancel"));
+    pointerCancel();
     onChange.mockClear();
-    fireEvent(
-      window,
-      new MouseEvent("pointermove", { clientX: 140, clientY: 90 })
-    );
+    pointerMove(140, 90);
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("supports multi-touch: two fingers drag the two handles simultaneously", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BezierEditor
+        defaultValue={[0.25, 0.25, 0.75, 0.75]}
+        onChange={onChange}
+      />
+    );
+    const [handle1, handle2] = getHandles(container);
+    pointerDown(handle1, 1);
+    pointerDown(handle2, 2);
+    pointerMove(60, 250, 1);
+    pointerMove(250, 60, 2);
+    const last = onChange.mock.calls.at(-1)![0] as BezierValue;
+    expect(last[0]).not.toBe(0.25);
+    expect(last[2]).not.toBe(0.75);
+    pointerUp(1);
+    onChange.mockClear();
+    pointerMove(80, 220, 1);
+    expect(onChange).not.toHaveBeenCalled();
+    pointerMove(240, 70, 2);
+    expect(onChange).toHaveBeenCalled();
+    pointerUp(2);
+  });
+
+  it("ignores a second pointer grabbing an already-dragged handle", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BezierEditor value={[0.25, 0.25, 0.75, 0.75]} onChange={onChange} />
+    );
+    const [handle1] = getHandles(container);
+    pointerDown(handle1, 1);
+    pointerDown(handle1, 2);
+    pointerMove(100, 100, 2);
+    expect(onChange).not.toHaveBeenCalled();
+    pointerMove(100, 100, 1);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    pointerUp(1);
+    pointerUp(2);
   });
 
   it("does not respond to pointer events in readOnly mode", () => {
