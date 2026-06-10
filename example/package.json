@@ -1,20 +1,23 @@
 {
-  "name": "example",
-  "version": "0.1.0",
+  "name": "bezier-easing-editor-example",
+  "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "react-scripts": "1.0.6"
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "bezier-easing-editor": "file:..",
-    "raf": "^3.3.0",
-    "react": "^15.4.0",
-    "react-dom": "^15.4.0"
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
   }
 }
