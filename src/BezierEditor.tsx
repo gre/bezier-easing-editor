@@ -166,7 +166,6 @@ export default function BezierEditor({
     background,
     cursor: down ? cursor.down : hover ? cursor.hover : cursor.def,
     userSelect: "none",
-    touchAction: "none",
     ...style,
   };
 

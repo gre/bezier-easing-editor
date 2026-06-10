@@ -58,6 +58,14 @@ function Handle(props: HandleProps) {
         stroke={handleColor}
         strokeWidth={hover || down ? 2 * handleStroke : handleStroke}
         fill={down ? background : handleColor}
+      />
+      {/* invisible hit area, larger than the visible handle for touch */}
+      <circle
+        data-handle={index}
+        cx={cx}
+        cy={cy}
+        r={Math.max(2 * handleRadius, 22)}
+        fill="transparent"
         style={{ touchAction: "none" }}
         onPointerDown={onPointerDown}
         onPointerEnter={onPointerEnter}

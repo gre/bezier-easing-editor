@@ -6,7 +6,9 @@ import type { BezierValue } from "./index";
 afterEach(cleanup);
 
 function getHandles(container: HTMLElement) {
-  return Array.from(container.querySelectorAll("circle"));
+  return Array.from(
+    container.querySelectorAll<SVGCircleElement>("circle[data-handle]")
+  );
 }
 
 // jsdom has no real PointerEvent: fireEvent.pointerMove drops clientX/clientY.
@@ -119,6 +121,30 @@ describe("BezierEditor", () => {
     pointerUp();
     expect(onChange).toHaveBeenCalled();
     expect(curveD()).not.toBe(before);
+  });
+
+  it("supports touch: drags via touch pointer events on the enlarged hit area", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <BezierEditor value={[0.25, 0.25, 0.75, 0.75]} onChange={onChange} />
+    );
+    const [handle1] = getHandles(container);
+    // the invisible hit area must be comfortably larger than the visible handle
+    expect(Number(handle1.getAttribute("r"))).toBeGreaterThanOrEqual(22);
+    expect(handle1.style.touchAction).toBe("none");
+    fireEvent.pointerDown(handle1, { pointerType: "touch" });
+    fireEvent(
+      window,
+      new MouseEvent("pointermove", { clientX: 120, clientY: 80 })
+    );
+    expect(onChange).toHaveBeenCalledTimes(1);
+    fireEvent(window, new MouseEvent("pointercancel"));
+    onChange.mockClear();
+    fireEvent(
+      window,
+      new MouseEvent("pointermove", { clientX: 140, clientY: 90 })
+    );
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it("does not respond to pointer events in readOnly mode", () => {
