@@ -1,0 +1,50 @@
+# Automates releases with changesets:
+# - when changesets are pending on master, opens/updates a "Version Packages" PR
+#   that bumps the version and updates the CHANGELOG
+# - when that PR is merged, publishes to npm and creates the git tag + GitHub release
+#
+# Publishing uses npm trusted publishing (OIDC): no NPM_TOKEN secret involved.
+# It requires this workflow to be configured as a Trusted Publisher on
+# https://www.npmjs.com/package/bezier-easing-editor/access
+# (GitHub Actions / repo gre/bezier-easing-editor / workflow release.yml)
+# and npm >= 11.5.1 (bundled with Node 24).
+name: Release
+
+on:
+  push:
+    branches: [master]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Create release PR or publish to npm
+        uses: changesets/action@v1
+        with:
+          publish: npx changeset publish
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

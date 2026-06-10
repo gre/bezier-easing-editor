@@ -83,6 +83,15 @@ npm run dev       # run the example app (vite)
 The example app is deployed to GitHub Pages automatically on every push to
 `master` by the [deploy workflow](.github/workflows/deploy-pages.yml).
 
+## Release
+
+Releases are automated with [changesets](https://github.com/changesets/changesets).
+Run `npx changeset` in your PR to describe the change and pick a semver bump.
+On merge, the [release workflow](.github/workflows/release.yml) opens a
+"Version Packages" PR; merging it publishes to npm (via
+[trusted publishing](https://docs.npmjs.com/trusted-publishers), no token)
+and creates the GitHub release.
+
 ## See also
 
 - [`bezier-easing`](https://github.com/gre/bezier-easing)
