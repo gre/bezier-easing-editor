@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { projectX, projectY, type Projection } from "./types";
 
 function range(from: number, to: number, step: number): number[] {
-  const t = [];
+  const t: number[] = [];
   for (let i = from; i < to; i += step) t.push(i);
   return t;
 }

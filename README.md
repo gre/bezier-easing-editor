@@ -27,6 +27,7 @@ Requires React 17 or higher. TypeScript types are included.
 Provide `value` and an `onChange` handler:
 
 ```tsx
+import { useState } from "react";
 import BezierEditor, { type BezierValue } from "bezier-easing-editor";
 
 function MyEditor() {
